@@ -8,6 +8,6 @@ namespace LinkedOut.DAL
         public DbSet<UserModel> Users { get; set; }
         public DbSet<PostModel> Posts { get; set; }
 
-        public DataLayer(DbContextOptions<DataLayer> option) : base(option) { }
+        public DataLayer(DbContextOptions<DataLayer> option) : base(option) { Database.EnsureCreated(); }
     }
 }

@@ -13,6 +13,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DataLayer>(options => options.UseSqlServer(cs));
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<PostService>();
 
 var app = builder.Build();
 

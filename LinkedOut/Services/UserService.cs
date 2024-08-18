@@ -16,7 +16,8 @@ namespace LinkedOut.Services
         {
             db.Users.Add(user);
             db.SaveChanges();
-            UserModel created = db.Users.FirstOrDefault(u=>u.userName == user.userName);
+            UserModel created = db.Users.FirstOrDefault(u => u.userName == user.userName);
+
             return created.id;
         }
     }

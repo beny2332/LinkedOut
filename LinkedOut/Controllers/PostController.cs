@@ -12,9 +12,9 @@ namespace LinkedOut.Controllers
     {
         private PostService postService;
 
-        public PostController(PostService _postService) {postService = _postService;}
-        
-        // get requst to get the list of all the posts.
+        public PostController(PostService _postService) { postService = _postService; }
+
+        // get the list of all the posts.
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<PostListDTO>> getAllPosts()
@@ -25,27 +25,47 @@ namespace LinkedOut.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
 
-        // get requst to get a post by its id.
+        // get a post by its id.
         public async Task<ActionResult<PostModel>> getPost(int id)
         {
             return Ok(await postService.getPostById(id));
         }
 
-        // post requst to create a new post.
+        // create a new post.
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<string>> createPost([FromBody] PostModel post)
+        public async Task<ActionResult> CreatePost([FromBody] NewPostDTO req)
         {
-            try
+            bool res = await postService.addNewPost(req);
+            if (res)
             {
-                int postId = await postService.createPost(post);
-                return CreatedAtAction(nameof(getPost), new { id = postId }, postId);
+                return Ok();
             }
-            catch (Exception ex)
+            else
             {
-                return BadRequest($"Error creating post: {ex.Message}");
+                return BadRequest();
             }
+        }
+
+        // Edit Post
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> editPost([FromBody] EditPostDTO req)
+        {
+            string oldBody = await postService.editPostBody(req.postId, req.newBody);
+            return oldBody != String.Empty ? Ok(oldBody) : NotFound();
+        }
+
+        // Delete
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> deletePost(int id)
+        {
+            int res = await postService.deletePostService(id);
+            return res != -1 ? Ok() : NotFound();
         }
 
     }

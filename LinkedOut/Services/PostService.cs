@@ -1,4 +1,5 @@
 ﻿using LinkedOut.DAL;
+using LinkedOut.DTO;
 using LinkedOut.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
@@ -12,27 +13,53 @@ namespace LinkedOut.Services
 
         public async Task<List<PostModel>> getAll()
         { 
-            return db.Posts.ToList();
+            return db.Posts.Include(p=>p.user).ToList();
         }
         public async Task<PostModel> getPostById(int id)
         {
-            return db.Posts.Find(id);
+            return db.Posts.Include(p => p.user).FirstOrDefault(p=> p.id == id);
         }
 
-        public async Task<int> createPost(PostModel post)
+        public async Task<bool> addNewPost(NewPostDTO req)
         {
-            var existingUser = await db.Users.FirstOrDefaultAsync(u => u.id == post.user.id);
-            if (existingUser == null) 
-            {
-                throw new Exception("User does not exist. Cannot create post for non-existent user.");
-            }
-
-            post.user = existingUser;
             
-            db.Posts.Add(post);
-            await db.SaveChangesAsync();
+            try
+            {
+                UserModel user = db.Users.Find(req.userId);
+                req.Post.user = user;
+                db.Posts.Add(req.Post);
+                db.SaveChanges();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
 
-            return post.id;
+        public async Task<string> editPostBody(int postId, string newBody)
+        {
+            PostModel post = db.Posts.Find(postId);
+            string oldBody = post.body;
+            post.body = newBody;
+            db.SaveChanges();
+            return oldBody;
+        }
+
+        public async Task<int> deletePostService(int  postId)
+        {
+            try
+            {
+                PostModel post = db.Posts.Find(postId);
+                db.Posts.Remove(post);
+                db.SaveChanges();
+                return post.id;
+            }
+            catch (Exception)
+            {
+
+                return -1;
+            }
         }
     }
 }

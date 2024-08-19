@@ -12,6 +12,11 @@ namespace LinkedOut.Services
             return db.Users.Find(id);
         }
 
+        public async Task<UserModel> GetUserByUserNameAndPassword(string un, string uhpw)
+        {
+            return db.Users.FirstOrDefault(u=>u.userName == un && u.UNHASHEDPassword == uhpw);
+        }
+
         public async Task<int> register(UserModel user)
         {
             db.Users.Add(user);

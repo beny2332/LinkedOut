@@ -26,7 +26,7 @@ namespace LinkedOut.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
 
         // get requst to get a post by its id.
-        public async Task<ActionResult<PostModel>> getSinglePosts(int id)
+        public async Task<ActionResult<PostModel>> getPost(int id)
         {
             return Ok(await postService.getPostById(id));
         }
@@ -37,16 +37,14 @@ namespace LinkedOut.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<string>> createPost([FromBody] PostModel post)
         {
-            int postId = await postService.createPost(post);
-            if (postId != 0)
+            try
             {
-                //Response.StatusCode = StatusCodes.Status201Created;
-                //await Response.WriteAsync(postId.ToString());
-                return Ok(postId);
+                int postId = await postService.createPost(post);
+                return CreatedAtAction(nameof(getPost), new { id = postId }, postId);
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest($"Error creating post: {ex.Message}");
             }
         }
 

@@ -1,5 +1,7 @@
 ﻿using LinkedOut.DAL;
 using LinkedOut.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 
 namespace LinkedOut.Services
 {
@@ -16,15 +18,21 @@ namespace LinkedOut.Services
         {
             return db.Posts.Find(id);
         }
+
         public async Task<int> createPost(PostModel post)
         {
+            var existingUser = await db.Users.FirstOrDefaultAsync(u => u.id == post.user.id);
+            if (existingUser == null) 
+            {
+                throw new Exception("User does not exist. Cannot create post for non-existent user.");
+            }
+
+            post.user = existingUser;
+            
             db.Posts.Add(post);
-            db.SaveChanges();
-            PostModel created = db.Posts.FirstOrDefault(p => p.body == post.body);
+            await db.SaveChangesAsync();
 
-            return created.id;
+            return post.id;
         }
-
-
     }
 }

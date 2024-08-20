@@ -22,7 +22,6 @@ namespace LinkedOut.Services
 
         public async Task<bool> addNewPost(NewPostDTO req)
         {
-            
             try
             {
                 UserModel user = db.Users.Find(req.userId);

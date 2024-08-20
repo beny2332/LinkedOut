@@ -7,23 +7,21 @@ using System.Text;
 namespace LinkedOut.Services
 {
     public class JwtService
-    { 
+    {
         private IConfiguration config;
-        public JwtService(IConfiguration _config) 
-        {
-            config = _config;
-        }
-        public string genJWToken(UserModel user) 
+        public JwtService(IConfiguration _config) { config = _config; }
+
+        public string genJWToken(UserModel user)
         {
             // get key and exp from the config
             string? key = config.GetValue("JWT:key", string.Empty);
             int? exp = config.GetValue("JWT:exp", 3);
 
             // create byte key
-            SymmetricSecurityKey secKey = new(Encoding.UTF8.GetBytes(key));
+            SymmetricSecurityKey secKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
 
             // create credentials
-            SigningCredentials crd = new(secKey, SecurityAlgorithms.HmacSha256);
+            SigningCredentials crd = new SigningCredentials(secKey, SecurityAlgorithms.HmacSha256);
 
             // create token payload (Claim)
             Claim[] claims = new[]

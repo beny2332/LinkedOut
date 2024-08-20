@@ -1,6 +1,7 @@
 ﻿using LinkedOut.DTO;
 using LinkedOut.Models;
 using LinkedOut.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LinkedOut.Controllers
@@ -31,7 +32,8 @@ namespace LinkedOut.Controllers
             return Ok(await postService.getPostById(id));
         }
 
-        // create a new post.
+        // Create a new post.
+        [Authorize]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -1,5 +1,6 @@
 ﻿using LinkedOut.DAL;
 using LinkedOut.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LinkedOut.Services
 {
@@ -14,16 +15,25 @@ namespace LinkedOut.Services
 
         public async Task<UserModel> GetUserByUserNameAndPassword(string un, string uhpw)
         {
-            return db.Users.FirstOrDefault(u=>u.userName == un && u.UNHASHEDPassword == uhpw);
+            UserModel user = db.Users.FirstOrDefault(u=>u.userName == un);
+            bool isVerified = BCrypt.Net.BCrypt.Verify(uhpw, user.password);
+
+            return isVerified ? user : null;
         }
 
         public async Task<int> register(UserModel user)
         {
+            string uhpw = user.password;
+            // hash the password
+            string hashedpw = BCrypt.Net.BCrypt.HashPassword(uhpw);
+            // save the hashed pw in the user
+            user.password = hashedpw;
             db.Users.Add(user);
             db.SaveChanges();
             UserModel created = db.Users.FirstOrDefault(u => u.userName == user.userName);
 
             return created.id;
         }
+
     }
 }
